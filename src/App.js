@@ -1,5 +1,7 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import { VariableSizeList } from "react-window"
+import { List as VirtualList } from "react-virtualized"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import logo from './logo.svg';
 import './App.css';
@@ -65,6 +67,37 @@ const App = () => {
     setItems(before.concat(after))
   }
 
+  const getRowRender = ({index, style}) => {
+    const item = items[index]
+
+    if(!item) return null
+
+    const patchedStyle = {
+      ...style
+    }
+    return (
+      <Draggable key={item.id} draggableId={item.id} index={index}>
+        {(draggableProvided, snapshot) => (
+          <div 
+            className="list-item"
+            ref={draggableProvided.innerRef}
+            {...draggableProvided.draggableProps}
+            {...draggableProvided.dragHandleProps}
+            style={draggableProvided.draggableProps.style}
+          > 
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+              <p>{item.content}</p>
+              <div style={{width: 30}}>
+                <button onClick={handleRemove(index)}>x</button>
+              </div>
+              
+            </div>
+          </div>
+        )}
+      </Draggable>
+    )
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -74,34 +107,26 @@ const App = () => {
       </header>
       <DragDropContext onDragEnd={onDragEnd}>
       <div className="list">
-        <Droppable droppableId="droppable">
-          {(provided, snapshot) => (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              {items.map((item, index) => {
-                return (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
-                    {(provided, snapshot) => (
-                      <div 
-                        className="list-item"
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={provided.draggableProps.style}
-                      > 
-                        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                          <p>{item.content}</p>
-                          <div style={{width: 30}}>
-                            <button onClick={handleRemove(index)}>x</button>
-                          </div>
-                         
-                        </div>
-                      </div>
-                    )}
-                  </Draggable>
-                )
-              })}
-              {provided.placeholder}
-            </div>
+        <Droppable droppableId="droppable" mode="virtual">
+          {(droppableProvided, snapshot) => (
+            <VirtualList
+              height={400}
+              width={500}
+              rowCount={items.length}
+              rowHeight={100}
+              ref={ref => {
+                if (ref) {
+                  // eslint-disable-next-line react/no-find-dom-node
+                  const listRef = ReactDOM.findDOMNode(ref);
+                  if (listRef instanceof HTMLElement) {
+                    droppableProvided.innerRef(listRef);
+                  }
+                }
+              }}
+              rowRenderer={getRowRender}
+            >
+              {droppableProvided.placeholder}
+            </VirtualList>
           )}
       </Droppable>
       </div>
