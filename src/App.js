@@ -4,6 +4,7 @@ import logo from './logo.svg';
 import './App.css';
 import { LoremIpsum } from "lorem-ipsum"
 import List from './List'
+import List2 from './List2'
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -37,7 +38,8 @@ const App = () => {
         <button onClick={handleGenerate}>generate</button>
         <button>reset</button>
       </header>
-      <List items={items} />
+      <List2 items={items} />
+      {/* <List items={items} /> */}
     </div>
   );
 }
