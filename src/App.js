@@ -5,6 +5,7 @@ import './App.css';
 import { LoremIpsum } from "lorem-ipsum"
 import List from './List'
 import List2 from './List2'
+import List3 from './List3'
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -17,6 +18,13 @@ const lorem = new LoremIpsum({
   }
 });
 
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 const App = () => {
   const [items, setItems] = React.useState([])
   const [numberOfItems, setNumberOfItems] = React.useState('')
@@ -24,9 +32,10 @@ const App = () => {
   const handleChangeNumberOfItems = (e) => {
     setNumberOfItems(e.target.value)
   }
-  const handleGenerate = () => {
-    let newItems = Array.from({length: numberOfItems}, () => lorem.generateSentences(Math.floor(Math.random() * 4) + 2 ))
-    setItems([...items, ...newItems])
+  const handleGenerate = () => { 
+    let newItems = Array.from({length: numberOfItems}, () => uuidv4())
+      .map(id => ({ id, content: lorem.generateSentences(Math.floor(Math.random() * 4) + 2 ) }))
+    setItems(newItems)
   }
 
   console.log(items)
@@ -38,7 +47,8 @@ const App = () => {
         <button onClick={handleGenerate}>generate</button>
         <button>reset</button>
       </header>
-      <List2 items={items} />
+      <List3 additionalItems={items} />
+      {/* <List2 items={items} /> */}
       {/* <List items={items} /> */}
     </div>
   );
