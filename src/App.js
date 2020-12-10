@@ -85,6 +85,8 @@ const App = () => {
     return (
       <Draggable key={item.id} draggableId={item.id} index={index}>
         {(draggableProvided, snapshot) => {
+          let a = draggableProvided.innerRef
+          debugger
           setRowHeight(index,draggableProvided.innerRef.clientHeight)
           return (
           <div 
@@ -120,6 +122,8 @@ const App = () => {
 
   function setRowHeight(index, size) {
     // listRef.current.resetAfterIndex(0);
+    debugger
+
     rowHeights.current = { ...rowHeights.current, [index]: size };
   }
 
@@ -152,8 +156,11 @@ const App = () => {
                 height={400}
                 width={500}
                 rowCount={items.length}
-                rowHeight={100}
-                itemSize={getRowHeight}
+                rowHeight={({index}) => {
+                  let a = rowHeights
+                  debugger
+                  return index * 100
+                }}
                 onScroll={handleScroll}
                 // ref={ref => {
                 //   if (ref) {
