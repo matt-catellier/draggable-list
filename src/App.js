@@ -1,5 +1,6 @@
 import React from 'react'
 import { VariableSizeList } from "react-window"
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import logo from './logo.svg';
 import './App.css';
 import { LoremIpsum } from "lorem-ipsum"
@@ -25,6 +26,14 @@ function uuidv4() {
   });
 }
 
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
 const App = () => {
   const [items, setItems] = React.useState([])
   const [numberOfItems, setNumberOfItems] = React.useState('')
@@ -35,21 +44,57 @@ const App = () => {
   const handleGenerate = () => { 
     let newItems = Array.from({length: numberOfItems}, () => uuidv4())
       .map(id => ({ id, content: lorem.generateSentences(Math.floor(Math.random() * 4) + 2 ) }))
+    setItems(items.concat(newItems))
+  }
+
+  const onDragEnd = (result) => {
+    if(!result.destination) {
+      return
+    }
+    const newItems = reorder(items, result.source.index, result.destination.index)
     setItems(newItems)
   }
 
-  console.log(items)
+  const handleReset = () => {
+    setItems([])
+  }
 
   return (
     <div className="App">
       <header className="App-header">
         <input id="number-of-items" type="number"  placeholder="# of items" value={numberOfItems} onChange={handleChangeNumberOfItems} />
         <button onClick={handleGenerate}>generate</button>
-        <button>reset</button>
+        <button onClick={handleReset}>reset</button>
       </header>
-      <List3 additionalItems={items} />
-      {/* <List2 items={items} /> */}
-      {/* <List items={items} /> */}
+      <DragDropContext onDragEnd={onDragEnd}>
+      <div className="list">
+        <Droppable droppableId="droppable">
+          {(provided, snapshot) => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              {items.map((item, index) => {
+                return (
+                  <Draggable key={item.id} draggableId={item.id} index={index}>
+                    {(provided, snapshot) => (
+                      <div 
+                        className="list-item"
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={provided.draggableProps.style}
+                      >
+                        <p>{item.content}</p>
+                      </div>
+                    )}
+                  </Draggable>
+                )
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+      </Droppable>
+      </div>
+    </DragDropContext>
+     
     </div>
   );
 }

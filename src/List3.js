@@ -16,11 +16,11 @@ const reorder = (list, startIndex, endIndex) => {
   return result;
 };
 
+
 export default ({ additionalItems }) => {
   const [_items, setItems] = React.useState([])
 
   React.useEffect(() => {
-    debugger
     setItems(_items.concat(additionalItems))
   }, [additionalItems])
 
