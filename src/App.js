@@ -59,6 +59,12 @@ const App = () => {
     setItems([])
   }
 
+  const handleRemove = (index) => () => {
+    let before = items.slice(0, index)
+    let after = items.slice(index + 1)
+    setItems(before.concat(after))
+  }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -81,8 +87,14 @@ const App = () => {
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         style={provided.draggableProps.style}
-                      >
-                        <p>{item.content}</p>
+                      > 
+                        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                          <p>{item.content}</p>
+                          <div style={{width: 30}}>
+                            <button onClick={handleRemove(index)}>x</button>
+                          </div>
+                         
+                        </div>
                       </div>
                     )}
                   </Draggable>
